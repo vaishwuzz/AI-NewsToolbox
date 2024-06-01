@@ -1,0 +1,180 @@
+<!-- File: templates/fake_news_detector.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detector</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome library -->
+    <style>
+        body {
+            font-family: Georgia, serif;
+            /* font-family: "Franklin Gothic Medium"; */
+            /*font-family: 'Times New Roman', Times, serif;  Newspaper font */
+            color: #000;
+            padding-top: 60px;
+            background-image: url('https://cdn.britannica.com/25/93825-050-D1300547/collection-newspapers.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            opacity: 0.9; /* Reduced opacity */
+        }
+
+        .navbar {
+            background-color: #000;
+            color: #fff;
+        }
+
+        .navbar-brand {
+            color: #fff !important;
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9); /* Reduced opacity for white background */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative; /* Added position property */
+        }
+
+        label {
+            color: #333;
+        }
+
+        .textarea-container {
+            position: relative; /* Added position property */
+        }
+
+        textarea, input {
+            width: 100%;
+            padding: 10px 40px 10px 10px; /* Added padding for the icon */
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: #eee;
+            color: #333;
+        }
+
+        .paste-icon {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            color: #333;
+            cursor: pointer;
+            z-index: 999; /* Added z-index to appear above the textarea */
+        }
+
+        .submit-btn {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px; /* Added margin */
+        }
+
+        .submit-btn:hover {
+            background-color: #333;
+        }
+
+        .result-section {
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.9); /* Reduced opacity for white background */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-section h2 {
+            color: #000;
+        }
+
+        .result-section p {
+            line-height: 1.6;
+            color: #555;
+            font-size: 20px; /* Increased font size for result */
+        }
+        .trybtn
+        {
+            background-color: #000;
+            color: #eee;
+            width: auto;
+            height: auto;
+            padding: 2%;
+            border-radius: 10px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">NEYZ AI</a>
+        </div>
+    </nav>
+
+    <div class="container form-container">
+        <h1 class="text-center mb-4" style="font-weight: bold;  ">FAKE NEWS DETECTOR</h1>
+        <form action="/fake_news_detector" method="post">
+            <div class="form-group textarea-container">
+                <label for="article" class="d-block" STYLE="font-size: 26px">Paste your news article:</label>
+                <textarea id="article" name="article" rows="10" cols="40" class="form-control" required></textarea>
+                <i class="fas fa-clipboard paste-icon" title="Paste Content" style="font-size: 24px;"></i> <!-- Font Awesome clipboard icon -->
+            </div>
+            <button type="submit" class="btn btn-primary submit-btn" style="font-size: 20px;">Submit</button>
+        </form>
+
+        {% if result %}
+    <div class="result-section mt-4" id="resultContainer">
+        <h2 style="font-weight: bold;">Result</h2>
+        <h4 style="font-weight: bold; text-align: center; color: #200d76;">
+            {% if result[0] == 'REAL' %}
+                Real news
+            {% elif result[0] == 'FAKE' %}
+                Fake news
+            {% else %}
+                Unknown
+            {% endif %}
+        </h4>
+        <div class="text-center">
+            <button type="button" class="trybtn" onclick="resetForm()">
+                Try Another Article
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvdrOLA0C5vR1Dj0pWRNNc8KburEKXjm8px3JYsz18Zw&s" width="30px" height="30px">
+            </button>
+        </div>
+    </div>
+{% endif %}
+
+    </div>
+
+    <!-- Paste feature script -->
+    <script>
+        // Add paste content functionality
+        const pasteIcon = document.querySelector('.paste-icon');
+        const articleTextarea = document.querySelector('#article');
+
+        pasteIcon.addEventListener('click', () => {
+            navigator.clipboard.readText().then(text => {
+                articleTextarea.value = text;
+            }).catch(err => {
+                console.error('Failed to read clipboard contents: ', err);
+            });
+        });
+
+        // Function to reset the form (clear input field and result container)
+        function resetForm() {
+            articleTextarea.value = '';
+            document.getElementById('resultContainer').style.display = 'none'; // Hide result container
+        }
+    </script>
+</body>
+</html>

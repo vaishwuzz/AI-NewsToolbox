@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Summarizer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> <!-- Font Awesome library -->
+    <style>
+        body {
+            font-family: Georgia, serif;
+            color: #000;
+            padding-top: 60px;
+            background-image: url('https://cdn.britannica.com/25/93825-050-D1300547/collection-newspapers.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            opacity: 0.9;
+        }
+
+        .navbar {
+            background-color: #000;
+            color: #fff;
+        }
+
+        .navbar-brand {
+            color: #fff !important;
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        label {
+            color: #333;
+        }
+
+        .textarea-container {
+            position: relative;
+        }
+
+        textarea, .custom-range {
+            width: 100%;
+            padding: 10px 40px 10px 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: #eee;
+            color: #333;
+        }
+
+        .paste-icon {
+            size: 100px; /* Increased size of the paste icon */
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            color: #333;
+            cursor: pointer;
+            z-index: 999; /* Added z-index to appear above the textarea */
+        }
+        .submit-btn {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background-color: #333;
+        }
+
+        .summary-section {
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-section h2 {
+            color: #000;
+            font-size: 26px;
+        }
+
+        .summary-section p {
+            line-height: 1.6;
+            color: #555;
+            font-size: 26px;
+        }
+
+        .trybtn {
+            background-color: #000;
+            color: #eee;
+            width: auto;
+            height: auto;
+            padding: 2%;
+            border-radius: 10px;
+            font-size: 20px;
+        }
+
+        .trybtn:hover {
+            background-color: #333;
+        }
+
+        /* Adjust scrollbar thumb size and color */
+        .custom-range::-webkit-slider-thumb {
+            width: 10px;
+            height: 20px;
+            background-color: black; /* Change scrollbar thumb color to black */
+        }
+
+        .custom-range::-moz-range-thumb {
+            width: 10px;
+            height: 20px;
+            background-color: black; /* Change scrollbar thumb color to black */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">NEYZ AI</a>
+        </div>
+    </nav>
+
+    <div class="container form-container">
+        <h1 class="text-center mb-4" style="font-weight: bold;">News Summarizer</h1>
+        <form action="/news_summarizer" method="post">
+            <div class="form-group textarea-container">
+                <label for="article" class="d-block" style="font-size: 26px;">Paste your news article:</label>
+                <textarea id="article" name="article" rows="10" cols="40" class="form-control" required></textarea>
+                <i class="fas fa-clipboard paste-icon" title="Paste Content" style="font-size: 24px;"></i>
+            </div>
+            <div class="form-group">
+                <label for="num_sentences" style="font-size: 19px;">Summary Length:</label>
+                <input type="range" id="num_sentences" name="num_sentences" min="1" max="4" value="2" class="custom-range" required>
+                <div class="d-flex justify-content-between">
+                    <span>Short</span>
+                    <span>Long</span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary submit-btn" style="font-size: 20px;">Summarize <i class="fas fa-sparkles"></i></button>
+        </form>
+
+        {% if article %}
+            <div class="summary-section mt-4">
+                <h2>Original Article:</h2>
+                <p style="font-size: 17px;">{{ article }}</p>
+                
+                <h2>Summarized Article:</h2>
+                <p style="font-size: 17px;">{{ summary }}</p>
+            </div>
+            <form action="/news_summarizer" method="get">
+                <div class="text-center">
+                    <button type="submit" class="trybtn" >Try Another Article <i class="fas fa-sync-alt"></i></button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+
+    <!-- Paste feature script -->
+    <script>
+        // Add paste content functionality
+        const pasteIcon = document.querySelector('.paste-icon');
+        const articleTextarea = document.querySelector('#article');
+
+        pasteIcon.addEventListener('click', () => {
+            navigator.clipboard.readText().then(text => {
+                articleTextarea.value = text;
+            }).catch(err => {
+                console.error('Failed to read clipboard contents: ', err);
+            });
+        });
+
+        // Function to reset the form (clear input field and result container)
+        function resetForm() {
+            articleTextarea.value = '';
+            document.getElementById('resultContainer').style.display = 'none'; // Hide result container
+        }
+        const numSentencesRange = document.querySelector('#num_sentences');
+
+        numSentencesRange.addEventListener('input', () => {
+            numSentencesRange.style.backgroundSize = (numSentencesRange.value - 1) * 33.33 + '% 100%';
+        });
+    </script>
+</body>
+</html>
